@@ -26,6 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.client.C02PacketUseEntity.Action;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.*;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.WorldSettings.GameType;
@@ -52,6 +53,7 @@ import java.util.Random;
 public class KillAura extends Module {
     private static final Minecraft mc = Minecraft.getMinecraft();
     public final ModeProperty mode;
+    public final BooleanProperty autoSwitchBlockMode = new BooleanProperty("Auto Switch Block Mode", false);
     public final ModeProperty sort;
     public ModeProperty autoBlock;
     private final BooleanProperty noSwap = new BooleanProperty("NoSwap", true, () -> this.autoBlock.getValue() == 2);
@@ -113,7 +115,19 @@ public class KillAura extends Module {
 
     public KillAura() {
         super("KillAura", false);
-        this.mode = new ModeProperty("Mode", 0, new String[]{"Single", "Switch"});
+        this.mode = new ModeProperty("Mode", 0, new String[]{"Single", "Switch"}){
+            @Override
+            public Integer getValue() {
+                    if (autoSwitchBlockMode.getValue()){
+                        if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.damageBoost)){
+                            return 1;
+                        }else {
+                            return 0;
+                        }
+                    }
+                    return this.value;
+            }
+        };
         this.sort = new ModeProperty("Sort", 0, new String[]{"Distance", "Health", "Hurt Time", "FOV"});
 
         this.autoBlock = new ModeProperty(

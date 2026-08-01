@@ -11,7 +11,7 @@ public abstract class Property<T> {
     private final T type;
     private final Predicate<T> validator;
     private final BooleanSupplier visibleChecker;
-    private T value;
+    protected T value;
     private Module owner;
 
     protected Property(String name, Object value, BooleanSupplier visibleChecker) {
